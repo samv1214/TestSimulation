@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderate Food Crisis Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .output {
+            margin-top: 20px;
+        }
+        .button {
+            padding: 10px 15px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Moderate Food Crisis Simulator</h2>
+        
+        <div class="controls">
+            <label for="initialFoodSupply">Initial Food Supply: </label>
+            <input type="number" id="initialFoodSupply" value="1000" min="0"><br><br>
+            
+            <label for="populationGrowthRate">Population Growth Rate (% per year): </label>
+            <input type="number" id="populationGrowthRate" value="2" min="0" step="0.1"><br><br>
+
+            <label for="foodAid">Food Aid (per year): </label>
+            <input type="number" id="foodAid" value="100" min="0"><br><br>
+
+            <button class="button" onclick="startSimulation()">Start Simulation</button>
+        </div>
+
+        <div class="output">
+            <h3>Simulation Results</h3>
+            <p id="foodSupply">Food Supply: 1000</p>
+            <p id="population">Population: 1000</p>
+            <p id="status">Status: Normal</p>
+        </div>
+    </div>
+
+    <script>
+        // Set initial values
+        let foodSupply = 1000;
+        let population = 1000;
+        let foodAid = 100;
+        let populationGrowthRate = 2;
+        let year = 0;
+        
+        // Function to start simulation
+        function startSimulation() {
+            // Get user input
+            foodSupply = parseInt(document.getElementById('initialFoodSupply').value);
+            populationGrowthRate = parseFloat(document.getElementById('populationGrowthRate').value);
+            foodAid = parseInt(document.getElementById('foodAid').value);
+            
+            // Reset the year and start simulating
+            year = 0;
+            simulateCrisis();
+        }
+        
+        // Function to simulate the crisis
+        function simulateCrisis() {
+            const interval = setInterval(function() {
+                // Update year
+                year++;
+
+                // Apply population growth
+                population += Math.round(population * (populationGrowthRate / 100));
+
+                // Apply food supply reduction based on population demand
+                foodSupply -= population * 0.1; // Assume each person consumes 0.1 food units per year
+
+                // Apply food aid
+                foodSupply += foodAid;
+
+                // Check the status of the crisis
+                let status = "Normal";
+                if (foodSupply < population * 0.1) {
+                    status = "Critical";
+                } else if (foodSupply < population * 0.3) {
+                    status = "Moderate Crisis";
+                }
+
+                // Update the UI
+                document.getElementById('foodSupply').textContent = `Food Supply: ${foodSupply.toFixed(0)}`;
+                document.getElementById('population').textContent = `Population: ${population.toFixed(0)}`;
+                document.getElementById('status').textContent = `Status: ${status}`;
+
+                // Stop the simulation if the food supply is too low
+                if (foodSupply <= 0) {
+                    clearInterval(interval);
+                    alert("Simulation Over: Food supply ran out!");
+                }
+            }, 1000); // Update every second for real-time simulation
+        }
+    </script>
+
+</body>
+</html>
