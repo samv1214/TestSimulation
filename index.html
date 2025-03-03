@@ -23,13 +23,13 @@
         <a-entity id="population" position="1 2 -4" text="value: Population: 1000; color: white; width: 4;"></a-entity>
         
         <!-- Interactive Crisis Buttons -->
-        <a-box position="-2 1.5 -3" color="red" depth="1" height="1" width="1" onclick="applyCrisis('drought')"></a-box>
+        <a-box id="drought" position="-2 1.5 -3" color="red" depth="1" height="1" width="1"></a-box>
         <a-entity position="-2 2 -3" text="value: Drought; color: black; width: 2;"></a-entity>
         
-        <a-box position="0 1.5 -3" color="gray" depth="1" height="1" width="1" onclick="applyCrisis('war')"></a-box>
+        <a-box id="war" position="0 1.5 -3" color="gray" depth="1" height="1" width="1"></a-box>
         <a-entity position="0 2 -3" text="value: War; color: black; width: 2;"></a-entity>
         
-        <a-box position="2 1.5 -3" color="green" depth="1" height="1" width="1" onclick="applyCrisis('aid')"></a-box>
+        <a-box id="aid" position="2 1.5 -3" color="green" depth="1" height="1" width="1"></a-box>
         <a-entity position="2 2 -3" text="value: Aid; color: black; width: 2;"></a-entity>
         
         <!-- VR Controls -->
@@ -57,6 +57,10 @@
             }
             updateStats();
         }
+        
+        document.querySelector('#drought').addEventListener('click', () => applyCrisis('drought'));
+        document.querySelector('#war').addEventListener('click', () => applyCrisis('war'));
+        document.querySelector('#aid').addEventListener('click', () => applyCrisis('aid'));
     </script>
 </body>
 </html>
