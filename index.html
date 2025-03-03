@@ -3,132 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homeless Simulation</title>
+    <title>Food Crisis Simulator - Judge Mode</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #282828;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-
-        /* Fullscreen background image */
-        #background {
-            width: 100%;
-            height: 400px;
-            background-image: url('https://images.unsplash.com/photo-1569185240-62f5929da1b1'); /* Real-life street image */
-            background-size: cover;
-            background-position: center;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-
-        p {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
-
-        .choices {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .choice-button {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            font-size: 18px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .choice-button:hover {
-            background-color: #45a049;
-        }
-
-        /* Parallax effect */
-        .parallax {
-            background-image: url('https://images.unsplash.com/photo-1587751857611-6c4d9b33bdf2'); /* Homeless street 2 */
-            height: 500px;
-            background-attachment: fixed;
-            background-position: center;
-            background-size: cover;
-        }
-
-        /* Adding some shadow to text for better visibility */
-        .shadow-text {
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .controls { margin-bottom: 20px; }
+        .button { padding: 10px; margin: 5px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        .button:hover { background: #45a049; }
+        .log { max-height: 200px; overflow-y: auto; background: #eee; padding: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
-
-    <div id="background"></div>
-
-    <h1 class="shadow-text">Welcome to the Homeless Simulation</h1>
-    <p class="shadow-text">Experience the tough choices faced daily by those without a home. Your decisions will affect the outcome.</p>
-   
-    <div id="story-text">
-        <p>You wake up on a cold, hard bench in the middle of the city. You haven't eaten in a day. What will you do?</p>
+    <div class="container">
+        <h2>Food Crisis Simulator - Judge Mode</h2>
+        
+        <div class="controls">
+            <label>Food Supply: </label><input type="number" id="foodSupply" value="1000">
+            <label>Population: </label><input type="number" id="population" value="1000">
+            <label>Growth Rate (%): </label><input type="number" id="growthRate" value="2">
+            <button class="button" onclick="startSimulation()">Start</button>
+            <button class="button" onclick="pauseSimulation()">Pause</button>
+        </div>
+        
+        <div class="controls">
+            <h3>Judge Controls</h3>
+            <button class="button" onclick="applyCrisis('drought')">Trigger Drought</button>
+            <button class="button" onclick="applyCrisis('war')">Trigger War</button>
+            <button class="button" onclick="applyCrisis('aid')">Provide Food Aid</button>
+        </div>
+        
+        <canvas id="chart"></canvas>
+        <h3>Event Log</h3>
+        <div class="log" id="log"></div>
     </div>
-
-    <div class="choices">
-        <button class="choice-button" onclick="nextStep('find-food')">Look for food</button>
-        <button class="choice-button" onclick="nextStep('find-shelter')">Look for shelter</button>
-        <button class="choice-button" onclick="nextStep('ask-for-help')">Ask for help</button>
-    </div>
-
-    <div class="parallax"></div> <!-- Adds a more immersive feel -->
-
+    
     <script>
-        function nextStep(choice) {
-            let storyText = document.getElementById('story-text');
-            let buttonContainer = document.querySelector('.choices');
-           
-            // Remove buttons after choice
-            buttonContainer.innerHTML = '';
-
-            if (choice === 'find-food') {
-                storyText.innerHTML = `<p>You decide to search the streets for food. You find a trash bin with some leftover pizza. It's not much, but it's better than nothing. What will you do next?</p>`;
-                createButtons([
-                    { text: 'Eat the pizza', action: 'eat-pizza' },
-                    { text: 'Look for more food', action: 'look-for-more-food' }
-                ]);
-            } else if (choice === 'find-shelter') {
-                storyText.innerHTML = `<p>You decide to look for shelter. You walk through the cold streets and find a small alleyway to sleep in. It’s not much, but it will protect you from the rain tonight. What will you do next?</p>`;
-                createButtons([
-                    { text: 'Rest and wait', action: 'rest' },
-                    { text: 'Try to find a shelter', action: 'find-shelter-again' }
-                ]);
-            } else if (choice === 'ask-for-help') {
-                storyText.innerHTML = `<p>You decide to ask people for help. A passerby gives you some change, and someone else offers a cup of coffee. You feel slightly better. What will you do next?</p>`;
-                createButtons([
-                    { text: 'Thank them and buy food', action: 'buy-food' },
-                    { text: 'Keep asking for more help', action: 'ask-more' }
-                ]);
+        let foodSupply = 1000, population = 1000, growthRate = 2, year = 0;
+        let running = false;
+        let years = [], foodData = [], populationData = [];
+        
+        const ctx = document.getElementById('chart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: years, datasets: [
+                { label: 'Food Supply', data: foodData, borderColor: 'red', fill: false },
+                { label: 'Population', data: populationData, borderColor: 'blue', fill: false }
+            ] },
+            options: { responsive: true }
+        });
+        
+        function logEvent(message) {
+            document.getElementById('log').innerHTML += `<p>${message}</p>`;
+        }
+        
+        function updateChart() {
+            chart.data.labels = years;
+            chart.data.datasets[0].data = foodData;
+            chart.data.datasets[1].data = populationData;
+            chart.update();
+        }
+        
+        function startSimulation() {
+            if (!running) {
+                running = setInterval(simulateStep, 1000);
             }
         }
-
-        function createButtons(options) {
-            let buttonContainer = document.querySelector('.choices');
-            options.forEach(option => {
-                let button = document.createElement('button');
-                button.innerText = option.text;
-                button.classList.add('choice-button');
-                button.onclick = () => nextStep(option.action);
-                buttonContainer.appendChild(button);
-            });
+        
+        function pauseSimulation() {
+            clearInterval(running);
+            running = false;
+        }
+        
+        function simulateStep() {
+            year++;
+            population += Math.round(population * (growthRate / 100));
+            foodSupply -= population * 0.1;
+            
+            years.push(year);
+            foodData.push(foodSupply);
+            populationData.push(population);
+            updateChart();
+            logEvent(`Year ${year}: Population ${population}, Food Supply ${foodSupply}`);
+        }
+        
+        function applyCrisis(type) {
+            if (type === 'drought') {
+                foodSupply *= 0.7;
+                logEvent('Drought occurred! Food supply reduced.');
+            } else if (type === 'war') {
+                population *= 0.9;
+                foodSupply *= 0.8;
+                logEvent('War occurred! Population and food supply reduced.');
+            } else if (type === 'aid') {
+                foodSupply += 500;
+                logEvent('Food aid received! Food supply increased.');
+            }
+            updateChart();
         }
     </script>
-
 </body>
 </html>
