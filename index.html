@@ -78,6 +78,7 @@
         let years = [];
         let foodSupplyData = [];
         let populationData = [];
+        let crisisStatusData = [];
 
         // Create a Chart.js chart
         const ctx = document.getElementById('simulationChart').getContext('2d');
@@ -90,28 +91,81 @@
                         label: 'Food Supply',
                         data: foodSupplyData,
                         borderColor: 'red',
-                        fill: false
+                        fill: false,
+                        pointBackgroundColor: 'red',
+                        pointRadius: 3
                     },
                     {
                         label: 'Population',
                         data: populationData,
                         borderColor: 'blue',
-                        fill: false
+                        fill: false,
+                        pointBackgroundColor: 'blue',
+                        pointRadius: 3
+                    },
+                    {
+                        label: 'Crisis Status',
+                        data: crisisStatusData,
+                        borderColor: 'transparent',
+                        backgroundColor: 'rgba(255, 0, 0, 0.2)', // red for crisis
+                        fill: true,
+                        pointRadius: 0
                     }
                 ]
             },
             options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            title: (tooltipItem) => {
+                                return 'Year ' + tooltipItem[0].label;
+                            },
+                            label: (tooltipItem) => {
+                                let datasetLabel = tooltipItem.dataset.label || '';
+                                let dataPoint = tooltipItem.raw || 0;
+                                if (datasetLabel === 'Food Supply') {
+                                    return datasetLabel + ': ' + dataPoint.toFixed(0);
+                                }
+                                if (datasetLabel === 'Population') {
+                                    return datasetLabel + ': ' + dataPoint.toFixed(0);
+                                }
+                                return datasetLabel + ': ' + dataPoint.toFixed(0);
+                            }
+                        }
+                    }
+                },
                 scales: {
                     x: {
                         title: {
                             display: true,
                             text: 'Years'
+                        },
+                        grid: {
+                            display: true
                         }
                     },
                     y: {
                         title: {
                             display: true,
                             text: 'Amount'
+                        },
+                        grid: {
+                            display: true
+                        }
+                    }
+                },
+                elements: {
+                    line: {
+                        tension: 0.4
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 12
                         }
                     }
                 }
@@ -130,11 +184,13 @@
             years = [];
             foodSupplyData = [];
             populationData = [];
-            
+            crisisStatusData = [];
+
             // Update the chart data
             chart.data.labels = years;
             chart.data.datasets[0].data = foodSupplyData;
             chart.data.datasets[1].data = populationData;
+            chart.data.datasets[2].data = crisisStatusData;
 
             // Start simulating
             simulateCrisis();
@@ -157,10 +213,13 @@
 
                 // Check the status of the crisis
                 let status = "Normal";
+                let crisisFill = 'rgba(0, 255, 0, 0.2)'; // green for normal
                 if (foodSupply < population * 0.1) {
                     status = "Critical";
+                    crisisFill = 'rgba(255, 0, 0, 0.5)'; // red for critical
                 } else if (foodSupply < population * 0.3) {
                     status = "Moderate Crisis";
+                    crisisFill = 'rgba(255, 165, 0, 0.3)'; // orange for moderate
                 }
 
                 // Update the UI
@@ -172,6 +231,10 @@
                 years.push(year);
                 foodSupplyData.push(foodSupply);
                 populationData.push(population);
+                crisisStatusData.push(foodSupply / population);
+
+                // Update the crisis fill color based on food supply status
+                chart.data.datasets[2].backgroundColor = crisisFill;
 
                 // Update the chart
                 chart.update();
