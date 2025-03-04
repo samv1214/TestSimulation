@@ -13,70 +13,74 @@
 <body>
     <h1>Homeless & Food Crisis Simulation</h1>
     <div id="scene">
-        <p id="story">You are homeless and hungry. You find a shelter offering food and blankets. Do you accept?</p>
-        <button onclick="nextScene('accept')">Accept the food and blanket</button>
-        <button onclick="nextScene('decline')">Decline and search elsewhere</button>
+        <p id="story">You are homeless and hungry. You have no money and no place to sleep. The cold wind bites at your skin. Your stomach growls in pain. What do you do first?</p>
+        <button onclick="nextScene('shelter')">Look for a homeless shelter</button>
+        <button onclick="nextScene('beg')">Beg for money</button>
+        <button onclick="nextScene('dumpster')">Search dumpsters for food</button>
+        <button onclick="nextScene('job')">Look for a temporary job</button>
     </div>
 
     <script>
+        let health = 100;
+        let hunger = 100;
+
         function nextScene(choice) {
             let story = document.getElementById("story");
             let scene = document.getElementById("scene");
             scene.innerHTML = ""; 
             scene.appendChild(story);
             
-            if (choice === 'accept') {
-                story.innerHTML = "You accept the food and blanket and rest outside. Night falls, and it's getting colder. Do you stay put or look for better shelter?";
-                addButton("Stay where you are", "stay");
-                addButton("Search for a safer place", "shelter");
+            if (choice === 'shelter') {
+                story.innerHTML = "You find a homeless shelter, but they only have limited space. You must wait in line. You see a mother with a child also waiting. Do you stay or try another option?";
+                addButton("Stay in line", "stay_line");
+                addButton("Give up your spot for the mother and leave", "look_elsewhere");
             } 
-            else if (choice === 'decline') {
-                story.innerHTML = "You decide to search elsewhere. You wander the city and find a trash bin with leftovers. Do you eat the scraps or keep searching?";
-                addButton("Eat the scraps", "eat");
-                addButton("Keep searching", "search");
+            else if (choice === 'beg') {
+                story.innerHTML = "You start begging on a busy street. People walk past without even looking at you. A woman stops and hands you $5 with a warm smile. What do you do with the money?";
+                addButton("Buy food", "buy_food");
+                addButton("Save for shelter", "save_shelter");
             }
-            else if (choice === 'stay') {
-                story.innerHTML = "You try to sleep, but the cold is unbearable. You wake up feeling weak. You must find food fast.";
-                addButton("Search for food", "search_food");
+            else if (choice === 'dumpster') {
+                story.innerHTML = "You find some leftover food in a dumpster. It's cold, stale, and possibly spoiled. You hesitate. Do you eat it?";
+                addButton("Eat the food", "eat_food");
+                addButton("Keep searching", "keep_searching");
             }
-            else if (choice === 'shelter') {
-                story.innerHTML = "You find an abandoned building. It's warmer, but you hear strange noises inside. Do you investigate or leave?";
-                addButton("Investigate", "investigate");
-                addButton("Leave", "leave");
+            else if (choice === 'job') {
+                story.innerHTML = "You search for a temporary job. A restaurant offers dishwashing for $20. The manager looks skeptical but offers you a chance. Do you accept?";
+                addButton("Accept the job", "accept_job");
+                addButton("Keep looking", "keep_looking_job");
             }
-            else if (choice === 'eat') {
-                story.innerHTML = "You eat the scraps, but they were spoiled. You feel sick and need medical attention.";
-                addButton("Find a hospital", "hospital");
+            else if (choice === 'eat_food') {
+                health -= 30;
+                story.innerHTML = "You eat the food, but it was spoiled. A sharp pain shoots through your stomach. You feel weak. Your health is now " + health + "%. You need medical help.";
+                addButton("Go to a free clinic", "free_clinic");
+                addButton("Try to sleep it off", "sleep_it_off");
+                addButton("Go Home", "restartGame");
+                checkGameOver();
             }
-            else if (choice === 'search') {
-                story.innerHTML = "You keep searching and find a small group offering food. They invite you to join them.";
-                addButton("Join the group", "join_group");
-                addButton("Continue alone", "decline_group");
+            else if (choice === 'keep_searching') {
+                hunger -= 20;
+                story.innerHTML = "You search further and find a charity giving out free meals. A kind volunteer hands you a warm plate of food. Tears well up in your eyes from gratitude.";
+                addButton("Thank them and leave", "thank_leave");
+                addButton("Ask for more help", "ask_help");
+                addButton("Go Home", "restartGame");
+                checkGameOver();
             }
-            else if (choice === 'search_food') {
-                story.innerHTML = "You find a soup kitchen giving out free meals. Do you line up or look for other options?";
-                addButton("Get in line", "line_up");
-                addButton("Keep looking", "keep_looking");
+            else if (choice === 'accept_job') {
+                hunger -= 15;
+                story.innerHTML = "You work hard, scrubbing dishes for hours. The manager sees your effort and hands you $20. Your hands ache, but you feel hopeful for the first time in a while.";
+                addButton("Buy food", "buy_food");
+                addButton("Save for better housing", "save_for_housing");
+                addButton("Go Home", "restartGame");
+                checkGameOver();
             }
-            else if (choice === 'investigate') {
-                story.innerHTML = "You find another homeless person inside. They offer to share the space but ask for some of your food. Do you share or refuse?";
-                addButton("Share food", "share_food");
-                addButton("Refuse", "refuse_share");
-            }
-            else if (choice === 'leave') {
-                story.innerHTML = "You leave and walk through the dark streets. A stranger offers you a ride. Do you accept or keep walking?";
-                addButton("Accept ride", "accept_ride");
-                addButton("Keep walking", "keep_walking");
-            }
-            else if (choice === 'join_group') {
-                story.innerHTML = "The group welcomes you. They have a small shelter, but food is scarce. Do you stay or move on?";
-                addButton("Stay with them", "stay_group");
-                addButton("Move on", "move_on");
-            }
-            else if (choice === 'decline_group') {
-                story.innerHTML = "You continue alone, but hunger and exhaustion make survival difficult. You must find a solution fast.";
-                addButton("Look for help", "look_help");
-                addButton("Try to earn money", "earn_money");
+            else if (choice === 'keep_looking_job') {
+                hunger -= 25;
+                story.innerHTML = "You keep searching, but find nothing else. Your stomach cramps from hunger. Your hunger is now " + hunger + "%. You feel dizzy and exhausted.";
+                addButton("Rest on a bench", "rest_bench");
+                addButton("Keep pushing on", "keep_pushing");
+                addButton("Go Home", "restartGame");
+                checkGameOver();
             }
         }
         
@@ -85,6 +89,22 @@
             btn.innerHTML = text;
             btn.onclick = function() { nextScene(action); };
             document.getElementById("scene").appendChild(btn);
+        }
+        
+        function checkGameOver() {
+            if (health <= 0) {
+                document.getElementById("story").innerHTML = "Your health has reached zero. You collapse on the street. Unfortunately, no one helps in time. Darkness takes over. You did not survive.";
+                document.getElementById("scene").innerHTML = "<button onclick='restartGame()'>Go Home</button>";
+            } else if (hunger <= 0) {
+                document.getElementById("story").innerHTML = "Your hunger has reached a critical level. Your body gives in to exhaustion. You pass out. You feel cold... and then nothing. You did not survive.";
+                document.getElementById("scene").innerHTML = "<button onclick='restartGame()'>Go Home</button>";
+            }
+        }
+
+        function restartGame() {
+            health = 100;
+            hunger = 100;
+            location.reload();
         }
     </script>
 </body>
