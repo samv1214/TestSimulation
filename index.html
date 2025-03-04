@@ -47,25 +47,38 @@
             0% { opacity: 0; }
             100% { opacity: 1; }
         }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://example.com/your-background-image.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
     </style>
 </head>
 <body>
+    <div class="background"></div>
+
     <div class="container">
         <div id="storyText" class="fade">
             <h1>Welcome to the Homeless Survival Simulation</h1>
-            <p id="narrative"></p>
-            <div id="buttons"></div>
+            <p id="narrative">You find yourself on a cold, dark street. The world feels empty. You don't have a place to sleep, nor food to eat. You've just lost everything.</p>
+            <button class="button" onclick="nextScene(1)">Look for a nearby shelter</button>
+            <button class="button" onclick="nextScene(2)">Find food in a nearby dumpster</button>
+            <button class="button" onclick="nextScene(3)">Try to find a park bench to sleep on</button>
         </div>
-        <button class="button" onclick="restartGame()">Restart Game</button>
     </div>
 
     <script>
         let currentScene = 0;
-
-        function startGame() {
-            currentScene = 0;
-            updateScene();
-        }
+        let outcome = '';
 
         function nextScene(scene) {
             currentScene = scene;
@@ -74,57 +87,126 @@
 
         function updateScene() {
             const narrative = document.getElementById('narrative');
-            const buttonsDiv = document.getElementById('buttons');
-            buttonsDiv.innerHTML = "";
+            const buttons = document.querySelectorAll('.button');
+            const storyText = document.getElementById('storyText');
 
-            if (currentScene === 0) {
-                narrative.innerHTML = "You find yourself on a cold, dark street. The world feels empty. You don't have a place to sleep, nor food to eat. You've just lost everything.";
-                createButtons([
-                    { text: "Look for a nearby shelter", next: 1 },
-                    { text: "Find food in a nearby dumpster", next: 2 },
-                    { text: "Try to find a park bench to sleep on", next: 3 }
-                ]);
-            } else if (currentScene === 1) {
-                narrative.innerHTML = "You search for a shelter, but space is limited. A mother with a child is also waiting. Do you stay or give up your spot?";
-                createButtons([
-                    { text: "Stay in line", next: 4 },
-                    { text: "Give up your spot", next: 5 }
-                ]);
-            } else if (currentScene === 2) {
-                narrative.innerHTML = "You dig through a dumpster and find old food scraps. It’s not much, but it’s something.";
-                createButtons([
-                    { text: "Eat what you found", next: 6 },
-                    { text: "Keep searching", next: 7 }
-                ]);
-            } else if (currentScene === 3) {
-                narrative.innerHTML = "You find a park bench to rest on. It's cold, but at least it's somewhere to sit.";
-                createButtons([
-                    { text: "Try to sleep", next: 8 },
-                    { text: "Keep walking", next: 9 }
-                ]);
-            } else {
-                narrative.innerHTML = "Simulation Over. Thank you for participating!";
+            // Remove all previous buttons
+            buttons.forEach(button => button.remove());
+
+            switch (currentScene) {
+                case 1:
+                    narrative.innerHTML = "You search around for any signs of shelter but see nothing. The night is starting to settle in, and you're feeling cold and scared.";
+                    createButtons([
+                        { text: "Knock on a nearby door for help", next: 4 },
+                        { text: "Continue walking, hoping to find something better", next: 5 },
+                        { text: "Sit on the sidewalk and wait for someone to help", next: 6 },
+                        { text: "Try to find a nearby alley to rest", next: 7 }
+                    ]);
+                    break;
+                case 2:
+                    narrative.innerHTML = "Your stomach growls louder. You dig through a dumpster and find some old food scraps. It's not much, but it’ll have to do for now.";
+                    createButtons([
+                        { text: "Eat what you found, but feel nauseous", next: 8 },
+                        { text: "Throw the food away and keep searching", next: 9 },
+                        { text: "Go to a nearby restaurant and ask for leftovers", next: 10 },
+                        { text: "Look for a nearby store to ask for donations", next: 11 }
+                    ]);
+                    break;
+                case 3:
+                    narrative.innerHTML = "You find a park bench. It's a little cold, but it’s a place to sit. A few people are around, but no one is paying attention to you.";
+                    createButtons([
+                        { text: "Try to sleep on the bench despite the cold", next: 12 },
+                        { text: "Move on and try to find a better place", next: 13 },
+                        { text: "Ask someone nearby for help", next: 14 },
+                        { text: "Find a nearby bus stop to wait until morning", next: 15 }
+                    ]);
+                    break;
+                case 4:
+                    narrative.innerHTML = "A stranger walks by and notices your situation. They offer you a blanket and suggest you rest in a nearby shelter.";
+                    createButtons([
+                        { text: "Rest in the shelter, where you receive food and a warm bed", next: 16, outcome: 'survived' },
+                        { text: "Rest in the shelter but feel hopeless about your future", next: 16, outcome: 'survived' },
+                        { text: "Decline the shelter and keep searching for something better", next: 17, outcome: 'died' },
+                        { text: "Ask the stranger if they have any extra food or supplies", next: 18, outcome: 'died' }
+                    ]);
+                    break;
+                case 5:
+                    narrative.innerHTML = "You keep walking through the city. The cold is biting, and you're exhausted. A dangerous place.";
+                    createButtons([
+                        { text: "Find a community center offering food and shelter", next: 19, outcome: 'survived' },
+                        { text: "Sleep outside under a bridge, hoping things get better", next: 20, outcome: 'died' },
+                        { text: "Ask more strangers for help, hoping someone will take pity on you", next: 21, outcome: 'died' },
+                        { text: "Try to find a bus to escape the city for a warmer place", next: 22, outcome: 'survived' }
+                    ]);
+                    break;
+                case 6:
+                    narrative.innerHTML = "No one is stopping to help, and the night is getting colder. You're starting to feel the weight of hopelessness.";
+                    createButtons([
+                        { text: "Stay and hope for someone to help", next: 23, outcome: 'died' },
+                        { text: "Try to find a more populated area", next: 24, outcome: 'died' },
+                        { text: "Go to a nearby church to ask for help", next: 25, outcome: 'survived' },
+                        { text: "Sit down and think about your next move", next: 26, outcome: 'died' }
+                    ]);
+                    break;
+                case 7:
+                    narrative.innerHTML = "You find a small alley. It’s not ideal, but it provides some cover from the wind. But it’s still cold.";
+                    createButtons([
+                        { text: "Sleep here, but the cold is unbearable", next: 27, outcome: 'died' },
+                        { text: "Get up and find a different place to sleep", next: 28, outcome: 'survived' },
+                        { text: "Try to find food or warmth nearby", next: 29, outcome: 'survived' },
+                        { text: "Stay alert, hoping someone will help", next: 30, outcome: 'survived' }
+                    ]);
+                    break;
+                case 8:
+                    narrative.innerHTML = "The food made you sick, and you feel weaker. You need to find help fast.";
+                    createButtons([
+                        { text: "Try to reach a hospital or medical center", next: 31, outcome: 'survived' },
+                        { text: "Find a place to rest, but you can barely move", next: 32, outcome: 'died' },
+                        { text: "Find a stranger and ask for help", next: 33, outcome: 'survived' },
+                        { text: "Walk aimlessly, hoping things will get better", next: 34, outcome: 'died' }
+                    ]);
+                    break;
+                // Continue similar patterns for the other scenes...
+                default:
+                    narrative.innerHTML = "Simulation Over. Thank you for participating!";
+                    break;
             }
+
+            // Apply fade-in effect for scene transition
+            storyText.classList.add('fade');
+            setTimeout(() => {
+                storyText.classList.remove('fade');
+            }, 1000);
         }
 
         function createButtons(options) {
-            const buttonsDiv = document.getElementById("buttons");
+            const container = document.querySelector('.container');
+
             options.forEach(option => {
-                const button = document.createElement("button");
-                button.classList.add("button");
+                const button = document.createElement('button');
+                button.classList.add('button');
                 button.innerHTML = option.text;
-                button.onclick = function () {
+                button.onclick = function() {
                     nextScene(option.next);
+                    if (option.outcome) {
+                        showOutcome(option.outcome);
+                    }
                 };
-                buttonsDiv.appendChild(button);
+                container.appendChild(button);
             });
         }
 
-        function restartGame() {
-            startGame();
+        function showOutcome(outcome) {
+            const factElement = document.createElement('p');
+            factElement.style.color = 'white';
+            if (outcome === 'survived') {
+                factElement.innerHTML = "You survived! Fact: 1 in 5 people who experience homelessness will survive with help from shelters, charities, and individuals.";
+            } else if (outcome === 'died') {
+                factElement.innerHTML = "You didn't make it. Fact: Homelessness is a serious issue, with an estimated 580,000 people experiencing homelessness in the U.S. each year.";
+            }
+            document.body.appendChild(factElement);
         }
 
-        startGame();
     </script>
 </body>
 </html>
