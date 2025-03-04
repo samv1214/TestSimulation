@@ -14,15 +14,23 @@
     <h1>Homeless & Food Crisis Simulation</h1>
     <div id="scene">
         <p id="story">You are homeless and hungry. You have no money and no place to sleep. The cold wind bites at your skin. Your stomach growls in pain. What do you do first?</p>
-        <button onclick="nextScene('shelter')">Look for a homeless shelter</button>
-        <button onclick="nextScene('beg')">Beg for money</button>
-        <button onclick="nextScene('dumpster')">Search dumpsters for food</button>
-        <button onclick="nextScene('job')">Look for a temporary job</button>
+        <button onclick="startGame()">Start Over</button>
     </div>
 
     <script>
-        let health = 100;
-        let hunger = 100;
+        let health, hunger;
+
+        function startGame() {
+            health = 100;
+            hunger = 100;
+            document.getElementById("scene").innerHTML = `
+                <p id="story">You are homeless and hungry. You have no money and no place to sleep. The cold wind bites at your skin. Your stomach growls in pain. What do you do first?</p>
+                <button onclick="nextScene('shelter')">Look for a homeless shelter</button>
+                <button onclick="nextScene('beg')">Beg for money</button>
+                <button onclick="nextScene('dumpster')">Search dumpsters for food</button>
+                <button onclick="nextScene('job')">Look for a temporary job</button>
+            `;
+        }
 
         function nextScene(choice) {
             let story = document.getElementById("story");
@@ -55,7 +63,7 @@
                 story.innerHTML = "You eat the food, but it was spoiled. A sharp pain shoots through your stomach. You feel weak. Your health is now " + health + "%. You need medical help.";
                 addButton("Go to a free clinic", "free_clinic");
                 addButton("Try to sleep it off", "sleep_it_off");
-                addButton("Go Home", "restartGame");
+                addButton("Go Home", "startGame");
                 checkGameOver();
             }
             else if (choice === 'keep_searching') {
@@ -63,7 +71,7 @@
                 story.innerHTML = "You search further and find a charity giving out free meals. A kind volunteer hands you a warm plate of food. Tears well up in your eyes from gratitude.";
                 addButton("Thank them and leave", "thank_leave");
                 addButton("Ask for more help", "ask_help");
-                addButton("Go Home", "restartGame");
+                addButton("Go Home", "startGame");
                 checkGameOver();
             }
             else if (choice === 'accept_job') {
@@ -71,7 +79,7 @@
                 story.innerHTML = "You work hard, scrubbing dishes for hours. The manager sees your effort and hands you $20. Your hands ache, but you feel hopeful for the first time in a while.";
                 addButton("Buy food", "buy_food");
                 addButton("Save for better housing", "save_for_housing");
-                addButton("Go Home", "restartGame");
+                addButton("Go Home", "startGame");
                 checkGameOver();
             }
             else if (choice === 'keep_looking_job') {
@@ -79,7 +87,7 @@
                 story.innerHTML = "You keep searching, but find nothing else. Your stomach cramps from hunger. Your hunger is now " + hunger + "%. You feel dizzy and exhausted.";
                 addButton("Rest on a bench", "rest_bench");
                 addButton("Keep pushing on", "keep_pushing");
-                addButton("Go Home", "restartGame");
+                addButton("Go Home", "startGame");
                 checkGameOver();
             }
         }
@@ -94,18 +102,14 @@
         function checkGameOver() {
             if (health <= 0) {
                 document.getElementById("story").innerHTML = "Your health has reached zero. You collapse on the street. Unfortunately, no one helps in time. Darkness takes over. You did not survive.";
-                document.getElementById("scene").innerHTML = "<button onclick='restartGame()'>Go Home</button>";
+                document.getElementById("scene").innerHTML = "<button onclick='startGame()'>Go Home</button>";
             } else if (hunger <= 0) {
                 document.getElementById("story").innerHTML = "Your hunger has reached a critical level. Your body gives in to exhaustion. You pass out. You feel cold... and then nothing. You did not survive.";
-                document.getElementById("scene").innerHTML = "<button onclick='restartGame()'>Go Home</button>";
+                document.getElementById("scene").innerHTML = "<button onclick='startGame()'>Go Home</button>";
             }
         }
 
-        function restartGame() {
-            health = 100;
-            hunger = 100;
-            location.reload();
-        }
+        startGame();
     </script>
 </body>
 </html>
