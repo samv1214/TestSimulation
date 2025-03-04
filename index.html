@@ -1,226 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Homelessness Simulation</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #1a1a1a;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      overflow: hidden;
-    }
+const scenarios = {
+  start: {
+    text: "You wake up on a cold park bench. You're homeless. The sun is rising, and your stomach growls. What do you do?",
+    options: [
+      { text: "Look for food in trash bins", next: "trash_bins" },
+      { text: "Ask strangers for money", next: "ask_money" },
+      { text: "Go to a shelter", next: "shelter" }
+    ],
+    background: "bg-[url('/park.jpg')] bg-cover bg-center"
+  },
+  trash_bins: {
+    text: "You find half a sandwich. It's stale but edible. A police officer approaches. What do you do?",
+    options: [
+      { text: "Run away", next: "runaway" },
+      { text: "Explain yourself", next: "explain" },
+      { text: "Ignore and keep eating", next: "ignore" }
+    ],
+    background: "bg-[url('/alley.jpg')] bg-cover bg-center"
+  },
+  ask_money: {
+    text: "People ignore you, but one person gives you $5. What do you do with it?",
+    options: [
+      { text: "Buy food", next: "buy_food" },
+      { text: "Buy alcohol", next: "buy_alcohol" },
+      { text: "Save it", next: "save_money" }
+    ],
+    background: "bg-[url('/street.jpg')] bg-cover bg-center"
+  },
+  shelter: {
+    text: "The shelter is full. They give you a blanket and a meal voucher for tomorrow. What do you do next?",
+    options: [
+      { text: "Sleep outside nearby", next: "sleep_outside" },
+      { text: "Try to sneak in", next: "sneak_in" },
+      { text: "Look for another shelter", next: "look_shelter" }
+    ],
+    background: "bg-[url('/shelter.jpg')] bg-cover bg-center"
+  },
+  runaway: { text: "You got away, but you're still hungry. You didn't survive the night.", options: [], background: "bg-[url('/night.jpg')] bg-cover bg-center", end: true },
+  explain: { text: "The officer understands and directs you to a soup kitchen. You survived another day.", options: [], background: "bg-[url('/kitchen.jpg')] bg-cover bg-center", end: true },
+  ignore: { text: "The officer arrests you for loitering. You didn't survive.", options: [], background: "bg-[url('/jail.jpg')] bg-cover bg-center", end: true },
+  buy_food: { text: "You eat and survive another day.", options: [], background: "bg-[url('/food.jpg')] bg-cover bg-center", end: true },
+  buy_alcohol: { text: "You got drunk and passed out. You didn't survive.", options: [], background: "bg-[url('/drunk.jpg')] bg-cover bg-center", end: true },
+  save_money: { text: "You saved it, but went hungry. You didn't survive.", options: [], background: "bg-[url('/night.jpg')] bg-cover bg-center", end: true },
+  sleep_outside: { text: "You froze to death. You didn't survive.", options: [], background: "bg-[url('/night.jpg')] bg-cover bg-center", end: true },
+  sneak_in: { text: "You got caught and arrested. You didn't survive.", options: [], background: "bg-[url('/jail.jpg')] bg-cover bg-center", end: true },
+  look_shelter: { text: "You found another shelter and survived the night.", options: [], background: "bg-[url('/shelter2.jpg')] bg-cover bg-center", end: true }
+};
 
-    #simulation-container {
-      text-align: center;
-      width: 80%;
-      max-width: 800px;
-      position: relative;
-    }
+export default function HomelessSimulation() {
+  const [scene, setScene] = useState('start');
 
-    .scene {
-      height: 400px;
-      width: 100%;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      position: relative;
-      overflow: hidden;
-      transition: transform 1s ease-in-out;
-    }
+  const handleOption = (next) => {
+    setScene(next);
+  };
 
-    .narrative {
-      font-size: 1.3em;
-      margin-bottom: 20px;
-      padding: 10px;
-      background: rgba(0, 0, 0, 0.6);
-      border-radius: 10px;
-      max-width: 80%;
-      margin: 0 auto;
-    }
-
-    .choices {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .choice-button {
-      background: #2c3e50;
-      color: white;
-      padding: 15px;
-      border: none;
-      border-radius: 5px;
-      font-size: 1.1em;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    .choice-button:hover {
-      background: #34495e;
-    }
-
-    #fact {
-      margin-top: 30px;
-      font-size: 1.1em;
-      font-style: italic;
-      opacity: 0;
-      transition: opacity 2s ease;
-    }
-  </style>
-</head>
-<body>
-  <div id="simulation-container">
-    <div id="scene" class="scene"></div>
-    <div id="narrative" class="narrative"></div>
-    <div id="choices" class="choices"></div>
-    <div id="fact" class="fact"></div>
-  </div>
-
-  <script>
-    // Simulated storyline and choices
-    let currentScene = 0;
-    let narrativeElement = document.getElementById("narrative");
-    let choicesElement = document.getElementById("choices");
-    let sceneElement = document.getElementById("scene");
-    let factElement = document.getElementById("fact");
-
-    const scenes = [
-      {
-        narrative: "You find yourself on a cold, dark street. The world feels empty. You don’t have a place to sleep, nor food to eat. You've just lost everything.",
-        image: "images/urban-street.jpg",
-        choices: [
-          { text: "Look for a nearby shelter", nextScene: 1 },
-          { text: "Find food in a nearby dumpster", nextScene: 2 },
-          { text: "Try to find a park bench to sleep on", nextScene: 3 }
-        ]
-      },
-      {
-        narrative: "You search around for any signs of shelter but see nothing. The night is starting to settle in, and you're feeling cold and scared.",
-        image: "images/shelter-search.jpg",
-        choices: [
-          { text: "Knock on a nearby door for help", nextScene: 4 },
-          { text: "Continue walking, hoping to find something better", nextScene: 5 },
-          { text: "Sit on the sidewalk and wait for someone to help", nextScene: 6 }
-        ]
-      },
-      {
-        narrative: "Your stomach growls louder. You dig through a dumpster and find some old food scraps. It's not much, but it’ll have to do for now.",
-        image: "images/food-search.jpg",
-        choices: [
-          { text: "Eat what you found, but feel nauseous", nextScene: 7 },
-          { text: "Throw the food away and keep searching", nextScene: 8 },
-          { text: "Go to a nearby restaurant and ask for leftovers", nextScene: 9 }
-        ]
-      },
-      {
-        narrative: "You find a park bench. It's a little cold but it’s a place to sit. A few people are around, but no one is paying attention to you.",
-        image: "images/sleep-spot.jpg",
-        choices: [
-          { text: "Try to sleep on the bench despite the cold", nextScene: 10 },
-          { text: "Move on and try to find a better place", nextScene: 11 },
-          { text: "Ask someone nearby for help", nextScene: 12 }
-        ]
-      },
-      {
-        narrative: "You knock on a door, and a woman answers. She tells you the shelter is full but offers you a blanket and some food.",
-        image: "images/shelter-full.jpg",
-        choices: [
-          { text: "Accept the food and blanket, and rest outside", nextScene: 13 },
-          { text: "Thank her and keep walking", nextScene: 14 },
-          { text: "Ask for more help or a place to stay", nextScene: 15 }
-        ]
-      },
-      {
-        narrative: "You decide to keep walking. The streets are getting emptier. It's hard to see a future right now, but you continue onward.",
-        image: "images/empty-street.jpg",
-        choices: [
-          { text: "Walk towards a different area in the city", nextScene: 16 },
-          { text: "Try to find another shelter", nextScene: 17 },
-          { text: "Look for a place to sleep under a bridge", nextScene: 18 }
-        ]
-      },
-      {
-        narrative: "You sit on the sidewalk. Some people pass by but ignore you. The night is getting colder, and you're starting to feel desperate.",
-        image: "images/cold-sidewalk.jpg",
-        choices: [
-          { text: "Fall asleep, hoping for help in the morning", nextScene: 19 },
-          { text: "Go to a nearby park to sleep in a safer area", nextScene: 20 },
-          { text: "Keep asking people for help", nextScene: 21 }
-        ]
-      },
-      // Outcome: You survive because of a wise decision
-      {
-        narrative: "You manage to find a shelter that has space. They offer you food and a warm bed for the night. Over the next few weeks, you get back on your feet.",
-        image: "images/shelter-safe.jpg",
-        choices: [],
-        outcome: 'survival'
-      },
-      // Outcome: You die because of exposure and lack of help
-      {
-        narrative: "You collapse on the cold sidewalk. Without shelter or help, your body succumbs to the harsh conditions.",
-        image: "images/cold-death.jpg",
-        choices: [],
-        outcome: 'death'
-      }
-    ];
-
-    function startSimulation() {
-      showScene(0);
-    }
-
-    function showScene(sceneIndex) {
-      let scene = scenes[sceneIndex];
-
-      // Apply background image and fade-in transition
-      sceneElement.style.transform = "scale(1.1)";
-      setTimeout(() => {
-        sceneElement.style.transform = "scale(1)";
-        sceneElement.style.background = `url('${scene.image}') center/cover no-repeat`;
-      }, 500);
-
-      narrativeElement.innerText = scene.narrative;
-
-      choicesElement.innerHTML = '';
-      if (scene.choices.length === 0) {
-        handleOutcome(scene.outcome);
-        return;
-      }
-
-      scene.choices.forEach(choice => {
-        let button = document.createElement("button");
-        button.classList.add("choice-button");
-        button.innerText = choice.text;
-        button.onclick = () => showScene(choice.nextScene);
-        choicesElement.appendChild(button);
-      });
-    }
-
-    function handleOutcome(outcome) {
-      if (outcome === 'survival') {
-        endSimulation("You survived homelessness with the help of a shelter. Many people experiencing homelessness find stability through community services.");
-      } else if (outcome === 'death') {
-        endSimulation("Sadly, without help or shelter, the harsh conditions of homelessness lead to premature death. 1 in 5 homeless individuals will die within their first year on the streets.");
-      }
-    }
-
-    function endSimulation(result) {
-      factElement.innerText = `Homelessness Fact: ${result}`;
-      factElement.style.opacity = 1;
-    }
-
-    startSimulation();
-  </script>
-</body>
-</html>
+  return (
+    <div className={`min-h-screen ${scenarios[scene].background} flex flex-col items-center justify-center text-white p-10 text-center`}>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
+        <h1 className="text-3xl mb-6">{scenarios[scene].text}</h1>
+        {scenarios[scene].options.length > 0 ? (
+          scenarios[scene].options.map((option, index) => (
+            <Button key={index} className="m-2" onClick={() => handleOption(option.next)}>
+              {option.text}
+            </Button>
+          ))
+        ) : (
+          <div>
+            <p className="text-lg">Fact: Over 580,000 people experience homelessness in the U.S. on any given night.</p>
+            <Button className="mt-4" onClick={() => setScene('start')}>Restart</Button>
+          </div>
+        )}
+      </motion.div>
+    </div>
+  );
+}
