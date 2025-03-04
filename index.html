@@ -1,90 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homelessness Simulation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-size: cover;
-            background-position: center;
-            color: white;
-        }
-        .container {
-            margin: 50px auto;
-            width: 80%;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border-radius: 10px;
-        }
-        .options button {
-            margin: 10px;
-            padding: 10px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homelessness Simulation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1a1a1a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #simulation-container {
+      text-align: center;
+      width: 80%;
+      max-width: 800px;
+      position: relative;
+    }
+
+    .scene {
+      height: 400px;
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 1s ease-in-out;
+    }
+
+    .narrative {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 10px;
+      max-width: 80%;
+      margin: 0 auto;
+    }
+
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .choice-button {
+      background: #2c3e50;
+      color: white;
+      padding: 15px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .choice-button:hover {
+      background: #34495e;
+    }
+
+    #fact {
+      margin-top: 30px;
+      font-size: 1.1em;
+      font-style: italic;
+      opacity: 0;
+      transition: opacity 2s ease;
+    }
+  </style>
 </head>
-<body id="background">
-    <div class="container">
-        <h1>Homelessness Simulation</h1>
-        <p id="story">You wake up on a cold sidewalk. You have nothing but the clothes on your back. What do you do?</p>
-        <div class="options">
-            <button onclick="chooseOption(1)">Search for food</button>
-            <button onclick="chooseOption(2)">Look for shelter</button>
-            <button onclick="chooseOption(3)">Ask for help</button>
-        </div>
-    </div>
+<body>
+  <div id="simulation-container">
+    <div id="scene" class="scene"></div>
+    <div id="narrative" class="narrative"></div>
+    <div id="choices" class="choices"></div>
+    <div id="fact" class="fact"></div>
+  </div>
 
-    <script>
-        const storyData = {
-            1: { text: "You find a half-eaten sandwich in the trash. Do you eat it or keep searching?", image: "https://source.unsplash.com/1600x900/?trash,food" },
-            2: { text: "You find an abandoned building. Do you stay there or keep moving?", image: "https://source.unsplash.com/1600x900/?abandoned,building" },
-            3: { text: "A stranger offers you $5. Do you accept, refuse, or ask for more?", image: "https://source.unsplash.com/1600x900/?homeless,help" },
-            4: { text: "You ate the sandwich but got food poisoning. You pass away on the street.", image: "https://source.unsplash.com/1600x900/?dark,street" },
-            5: { text: "You keep searching and find a soup kitchen. You survive another day!", image: "https://source.unsplash.com/1600x900/?soup,kitchen" },
-            6: { text: "The building collapses. You do not survive.", image: "https://source.unsplash.com/1600x900/?ruins" },
-            7: { text: "You stay in the building and find a warm corner. You live another night!", image: "https://source.unsplash.com/1600x900/?warm,corner" },
-            8: { text: "You accept the money and buy food. You make it another day!", image: "https://source.unsplash.com/1600x900/?food,store" },
-            9: { text: "You refuse the money and stay hungry. You do not make it.", image: "https://source.unsplash.com/1600x900/?empty,street" },
-            10: { text: "You ask for more, and they call the police on you. You are taken to a shelter!", image: "https://source.unsplash.com/1600x900/?homeless,shelter" }
-        };
-       
-        let startTime = Date.now();
-        let maxTime = 105000; // 1 minute 45 seconds
+  <script>
+    // Simulated storyline and choices
+    let currentScene = 0;
+    let narrativeElement = document.getElementById("narrative");
+    let choicesElement = document.getElementById("choices");
+    let sceneElement = document.getElementById("scene");
+    let factElement = document.getElementById("fact");
 
-        function chooseOption(option) {
-            let elapsedTime = Date.now() - startTime;
-            if (elapsedTime >= maxTime) {
-                document.getElementById("story").innerText = "Time's up. Your journey has ended.";
-                document.querySelector(".options").innerHTML = "<p>Simulation Over</p><p>Fact: Over 500,000 people experience homelessness on a single night in the U.S.</p>";
-                return;
-            }
-           
-            let nextStep;
-            switch (option) {
-                case 1:
-                    nextStep = Math.random() < 0.5 ? 4 : 5;
-                    break;
-                case 2:
-                    nextStep = Math.random() < 0.5 ? 6 : 7;
-                    break;
-                case 3:
-                    nextStep = Math.random() < 0.33 ? 8 : (Math.random() < 0.5 ? 9 : 10);
-                    break;
-                default:
-                    nextStep = 1;
-            }
-            document.getElementById("story").innerText = storyData[nextStep].text;
-            document.getElementById("background").style.background = `url('${storyData[nextStep].image}') no-repeat center center fixed`;
-            document.getElementById("background").style.backgroundSize = "cover";
-           
-            if (nextStep >= 4) {
-                document.querySelector(".options").innerHTML = "<p>Simulation Over</p><p>Fact: Over 500,000 people experience homelessness on a single night in the U.S.</p>";
-            }
-        }
-    </script>
+    const scenes = [
+      {
+        narrative: "You find yourself on a cold, dark street. The world feels empty. You don’t have a place to sleep, nor food to eat. You've just lost everything.",
+        image: "images/urban-street.jpg",
+        choices: [
+          { text: "Look for a nearby shelter", nextScene: 1 },
+          { text: "Find food in a nearby dumpster", nextScene: 2 },
+          { text: "Try to find a park bench to sleep on", nextScene: 3 }
+        ]
+      },
+      {
+        narrative: "You search around for any signs of shelter but see nothing. The night is starting to settle in, and you're feeling cold and scared.",
+        image: "images/shelter-search.jpg",
+        choices: [
+          { text: "Knock on a nearby door for help", nextScene: 4 },
+          { text: "Continue walking, hoping to find something better", nextScene: 5 },
+          { text: "Sit on the sidewalk and wait for someone to help", nextScene: 6 }
+        ]
+      },
+      {
+        narrative: "Your stomach growls louder. You dig through a dumpster and find some old food scraps. It's not much, but it’ll have to do for now.",
+        image: "images/food-search.jpg",
+        choices: [
+          { text: "Eat what you found, but feel nauseous", nextScene: 7 },
+          { text: "Throw the food away and keep searching", nextScene: 8 },
+          { text: "Go to a nearby restaurant and ask for leftovers", nextScene: 9 }
+        ]
+      },
+      {
+        narrative: "You find a park bench. It's a little cold but it’s a place to sit. A few people are around, but no one is paying attention to you.",
+        image: "images/sleep-spot.jpg",
+        choices: [
+          { text: "Try to sleep on the bench despite the cold", nextScene: 10 },
+          { text: "Move on and try to find a better place", nextScene: 11 },
+          { text: "Ask someone nearby for help", nextScene: 12 }
+        ]
+      },
+      {
+        narrative: "You knock on a door, and a woman answers. She tells you the shelter is full but offers you a blanket and some food.",
+        image: "images/shelter-full.jpg",
+        choices: [
+          { text: "Accept the food and blanket, and rest outside", nextScene: 13 },
+          { text: "Thank her and keep walking", nextScene: 14 },
+          { text: "Ask for more help or a place to stay", nextScene: 15 }
+        ]
+      },
+      {
+        narrative: "You decide to keep walking. The streets are getting emptier. It's hard to see a future right now, but you continue onward.",
+        image: "images/empty-street.jpg",
+        choices: [
+          { text: "Walk towards a different area in the city", nextScene: 16 },
+          { text: "Try to find another shelter", nextScene: 17 },
+          { text: "Look for a place to sleep under a bridge", nextScene: 18 }
+        ]
+      },
+      {
+        narrative: "You sit on the sidewalk. Some people pass by but ignore you. The night is getting colder, and you're starting to feel desperate.",
+        image: "images/cold-sidewalk.jpg",
+        choices: [
+          { text: "Fall asleep, hoping for help in the morning", nextScene: 19 },
+          { text: "Go to a nearby park to sleep in a safer area", nextScene: 20 },
+          { text: "Keep asking people for help", nextScene: 21 }
+        ]
+      },
+      // Outcome: You survive because of a wise decision
+      {
+        narrative: "You manage to find a shelter that has space. They offer you food and a warm bed for the night. Over the next few weeks, you get back on your feet.",
+        image: "images/shelter-safe.jpg",
+        choices: [],
+        outcome: 'survival'
+      },
+      // Outcome: You die because of exposure and lack of help
+      {
+        narrative: "You collapse on the cold sidewalk. Without shelter or help, your body succumbs to the harsh conditions.",
+        image: "images/cold-death.jpg",
+        choices: [],
+        outcome: 'death'
+      }
+    ];
+
+    function startSimulation() {
+      showScene(0);
+    }
+
+    function showScene(sceneIndex) {
+      let scene = scenes[sceneIndex];
+
+      // Apply background image and fade-in transition
+      sceneElement.style.transform = "scale(1.1)";
+      setTimeout(() => {
+        sceneElement.style.transform = "scale(1)";
+        sceneElement.style.background = `url('${scene.image}') center/cover no-repeat`;
+      }, 500);
+
+      narrativeElement.innerText = scene.narrative;
+
+      choicesElement.innerHTML = '';
+      if (scene.choices.length === 0) {
+        handleOutcome(scene.outcome);
+        return;
+      }
+
+      scene.choices.forEach(choice => {
+        let button = document.createElement("button");
+        button.classList.add("choice-button");
+        button.innerText = choice.text;
+        button.onclick = () => showScene(choice.nextScene);
+        choicesElement.appendChild(button);
+      });
+    }
+
+    function handleOutcome(outcome) {
+      if (outcome === 'survival') {
+        endSimulation("You survived homelessness with the help of a shelter. Many people experiencing homelessness find stability through community services.");
+      } else if (outcome === 'death') {
+        endSimulation("Sadly, without help or shelter, the harsh conditions of homelessness lead to premature death. 1 in 5 homeless individuals will die within their first year on the streets.");
+      }
+    }
+
+    function endSimulation(result) {
+      factElement.innerText = `Homelessness Fact: ${result}`;
+      factElement.style.opacity = 1;
+    }
+
+    startSimulation();
+  </script>
 </body>
 </html>
