@@ -1,75 +1,90 @@
-const scenarios = {
-  start: {
-    text: "You wake up on a cold park bench. You're homeless. The sun is rising, and your stomach growls. What do you do?",
-    options: [
-      { text: "Look for food in trash bins", next: "trash_bins" },
-      { text: "Ask strangers for money", next: "ask_money" },
-      { text: "Go to a shelter", next: "shelter" }
-    ],
-    background: "bg-[url('/park.jpg')] bg-cover bg-center"
-  },
-  trash_bins: {
-    text: "You find half a sandwich. It's stale but edible. A police officer approaches. What do you do?",
-    options: [
-      { text: "Run away", next: "runaway" },
-      { text: "Explain yourself", next: "explain" },
-      { text: "Ignore and keep eating", next: "ignore" }
-    ],
-    background: "bg-[url('/alley.jpg')] bg-cover bg-center"
-  },
-  ask_money: {
-    text: "People ignore you, but one person gives you $5. What do you do with it?",
-    options: [
-      { text: "Buy food", next: "buy_food" },
-      { text: "Buy alcohol", next: "buy_alcohol" },
-      { text: "Save it", next: "save_money" }
-    ],
-    background: "bg-[url('/street.jpg')] bg-cover bg-center"
-  },
-  shelter: {
-    text: "The shelter is full. They give you a blanket and a meal voucher for tomorrow. What do you do next?",
-    options: [
-      { text: "Sleep outside nearby", next: "sleep_outside" },
-      { text: "Try to sneak in", next: "sneak_in" },
-      { text: "Look for another shelter", next: "look_shelter" }
-    ],
-    background: "bg-[url('/shelter.jpg')] bg-cover bg-center"
-  },
-  runaway: { text: "You got away, but you're still hungry. You didn't survive the night.", options: [], background: "bg-[url('/night.jpg')] bg-cover bg-center", end: true },
-  explain: { text: "The officer understands and directs you to a soup kitchen. You survived another day.", options: [], background: "bg-[url('/kitchen.jpg')] bg-cover bg-center", end: true },
-  ignore: { text: "The officer arrests you for loitering. You didn't survive.", options: [], background: "bg-[url('/jail.jpg')] bg-cover bg-center", end: true },
-  buy_food: { text: "You eat and survive another day.", options: [], background: "bg-[url('/food.jpg')] bg-cover bg-center", end: true },
-  buy_alcohol: { text: "You got drunk and passed out. You didn't survive.", options: [], background: "bg-[url('/drunk.jpg')] bg-cover bg-center", end: true },
-  save_money: { text: "You saved it, but went hungry. You didn't survive.", options: [], background: "bg-[url('/night.jpg')] bg-cover bg-center", end: true },
-  sleep_outside: { text: "You froze to death. You didn't survive.", options: [], background: "bg-[url('/night.jpg')] bg-cover bg-center", end: true },
-  sneak_in: { text: "You got caught and arrested. You didn't survive.", options: [], background: "bg-[url('/jail.jpg')] bg-cover bg-center", end: true },
-  look_shelter: { text: "You found another shelter and survived the night.", options: [], background: "bg-[url('/shelter2.jpg')] bg-cover bg-center", end: true }
-};
-
-export default function HomelessSimulation() {
-  const [scene, setScene] = useState('start');
-
-  const handleOption = (next) => {
-    setScene(next);
-  };
-
-  return (
-    <div className={`min-h-screen ${scenarios[scene].background} flex flex-col items-center justify-center text-white p-10 text-center`}>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
-        <h1 className="text-3xl mb-6">{scenarios[scene].text}</h1>
-        {scenarios[scene].options.length > 0 ? (
-          scenarios[scene].options.map((option, index) => (
-            <Button key={index} className="m-2" onClick={() => handleOption(option.next)}>
-              {option.text}
-            </Button>
-          ))
-        ) : (
-          <div>
-            <p className="text-lg">Fact: Over 580,000 people experience homelessness in the U.S. on any given night.</p>
-            <Button className="mt-4" onClick={() => setScene('start')}>Restart</Button>
-          </div>
-        )}
-      </motion.div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homelessness Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
+        .container {
+            margin: 50px auto;
+            width: 80%;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .options button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body id="background">
+    <div class="container">
+        <h1>Homelessness Simulation</h1>
+        <p id="story">You wake up on a cold sidewalk. You have nothing but the clothes on your back. What do you do?</p>
+        <div class="options">
+            <button onclick="chooseOption(1)">Search for food</button>
+            <button onclick="chooseOption(2)">Look for shelter</button>
+            <button onclick="chooseOption(3)">Ask for help</button>
+        </div>
     </div>
-  );
-}
+
+    <script>
+        const storyData = {
+            1: { text: "You find a half-eaten sandwich in the trash. Do you eat it or keep searching?", image: "https://source.unsplash.com/1600x900/?trash,food" },
+            2: { text: "You find an abandoned building. Do you stay there or keep moving?", image: "https://source.unsplash.com/1600x900/?abandoned,building" },
+            3: { text: "A stranger offers you $5. Do you accept, refuse, or ask for more?", image: "https://source.unsplash.com/1600x900/?homeless,help" },
+            4: { text: "You ate the sandwich but got food poisoning. You pass away on the street.", image: "https://source.unsplash.com/1600x900/?dark,street" },
+            5: { text: "You keep searching and find a soup kitchen. You survive another day!", image: "https://source.unsplash.com/1600x900/?soup,kitchen" },
+            6: { text: "The building collapses. You do not survive.", image: "https://source.unsplash.com/1600x900/?ruins" },
+            7: { text: "You stay in the building and find a warm corner. You live another night!", image: "https://source.unsplash.com/1600x900/?warm,corner" },
+            8: { text: "You accept the money and buy food. You make it another day!", image: "https://source.unsplash.com/1600x900/?food,store" },
+            9: { text: "You refuse the money and stay hungry. You do not make it.", image: "https://source.unsplash.com/1600x900/?empty,street" },
+            10: { text: "You ask for more, and they call the police on you. You are taken to a shelter!", image: "https://source.unsplash.com/1600x900/?homeless,shelter" }
+        };
+       
+        let startTime = Date.now();
+        let maxTime = 105000; // 1 minute 45 seconds
+
+        function chooseOption(option) {
+            let elapsedTime = Date.now() - startTime;
+            if (elapsedTime >= maxTime) {
+                document.getElementById("story").innerText = "Time's up. Your journey has ended.";
+                document.querySelector(".options").innerHTML = "<p>Simulation Over</p><p>Fact: Over 500,000 people experience homelessness on a single night in the U.S.</p>";
+                return;
+            }
+           
+            let nextStep;
+            switch (option) {
+                case 1:
+                    nextStep = Math.random() < 0.5 ? 4 : 5;
+                    break;
+                case 2:
+                    nextStep = Math.random() < 0.5 ? 6 : 7;
+                    break;
+                case 3:
+                    nextStep = Math.random() < 0.33 ? 8 : (Math.random() < 0.5 ? 9 : 10);
+                    break;
+                default:
+                    nextStep = 1;
+            }
+            document.getElementById("story").innerText = storyData[nextStep].text;
+            document.getElementById("background").style.background = `url('${storyData[nextStep].image}') no-repeat center center fixed`;
+            document.getElementById("background").style.backgroundSize = "cover";
+           
+            if (nextStep >= 4) {
+                document.querySelector(".options").innerHTML = "<p>Simulation Over</p><p>Fact: Over 500,000 people experience homelessness on a single night in the U.S.</p>";
+            }
+        }
+    </script>
+</body>
+</html>
