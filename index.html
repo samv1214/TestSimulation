@@ -22,35 +22,69 @@
         function nextScene(choice) {
             let story = document.getElementById("story");
             let scene = document.getElementById("scene");
+            scene.innerHTML = ""; 
+            scene.appendChild(story);
             
             if (choice === 'accept') {
                 story.innerHTML = "You accept the food and blanket and rest outside. Night falls, and it's getting colder. Do you stay put or look for better shelter?";
-                scene.innerHTML += '<button onclick="nextScene(\'stay\')">Stay where you are</button>';
-                scene.innerHTML += '<button onclick="nextScene(\'shelter\')">Search for a safer place</button>';
+                addButton("Stay where you are", "stay");
+                addButton("Search for a safer place", "shelter");
             } 
             else if (choice === 'decline') {
                 story.innerHTML = "You decide to search elsewhere. You wander the city and find a trash bin with leftovers. Do you eat the scraps or keep searching?";
-                scene.innerHTML += '<button onclick="nextScene(\'eat\')">Eat the scraps</button>';
-                scene.innerHTML += '<button onclick="nextScene(\'search\')">Keep searching</button>';
+                addButton("Eat the scraps", "eat");
+                addButton("Keep searching", "search");
             }
             else if (choice === 'stay') {
-                story.innerHTML = "You try to sleep, but the cold is unbearable. You wake up feeling weak. Your hunger increases. You must find food fast.";
-                scene.innerHTML = '<button onclick="nextScene(\'search_food\')">Search for food</button>';
+                story.innerHTML = "You try to sleep, but the cold is unbearable. You wake up feeling weak. You must find food fast.";
+                addButton("Search for food", "search_food");
             }
             else if (choice === 'shelter') {
                 story.innerHTML = "You find an abandoned building. It's warmer, but you hear strange noises inside. Do you investigate or leave?";
-                scene.innerHTML = '<button onclick="nextScene(\'investigate\')">Investigate</button>';
-                scene.innerHTML += '<button onclick="nextScene(\'leave\')">Leave</button>';
+                addButton("Investigate", "investigate");
+                addButton("Leave", "leave");
             }
             else if (choice === 'eat') {
                 story.innerHTML = "You eat the scraps, but they were spoiled. You feel sick and need medical attention.";
-                scene.innerHTML = '<button onclick="nextScene(\'hospital\')">Find a hospital</button>';
+                addButton("Find a hospital", "hospital");
             }
             else if (choice === 'search') {
                 story.innerHTML = "You keep searching and find a small group offering food. They invite you to join them.";
-                scene.innerHTML = '<button onclick="nextScene(\'join_group\')">Join the group</button>';
-                scene.innerHTML += '<button onclick="nextScene(\'decline_group\')">Continue alone</button>';
+                addButton("Join the group", "join_group");
+                addButton("Continue alone", "decline_group");
             }
+            else if (choice === 'search_food') {
+                story.innerHTML = "You find a soup kitchen giving out free meals. Do you line up or look for other options?";
+                addButton("Get in line", "line_up");
+                addButton("Keep looking", "keep_looking");
+            }
+            else if (choice === 'investigate') {
+                story.innerHTML = "You find another homeless person inside. They offer to share the space but ask for some of your food. Do you share or refuse?";
+                addButton("Share food", "share_food");
+                addButton("Refuse", "refuse_share");
+            }
+            else if (choice === 'leave') {
+                story.innerHTML = "You leave and walk through the dark streets. A stranger offers you a ride. Do you accept or keep walking?";
+                addButton("Accept ride", "accept_ride");
+                addButton("Keep walking", "keep_walking");
+            }
+            else if (choice === 'join_group') {
+                story.innerHTML = "The group welcomes you. They have a small shelter, but food is scarce. Do you stay or move on?";
+                addButton("Stay with them", "stay_group");
+                addButton("Move on", "move_on");
+            }
+            else if (choice === 'decline_group') {
+                story.innerHTML = "You continue alone, but hunger and exhaustion make survival difficult. You must find a solution fast.";
+                addButton("Look for help", "look_help");
+                addButton("Try to earn money", "earn_money");
+            }
+        }
+        
+        function addButton(text, action) {
+            let btn = document.createElement("button");
+            btn.innerHTML = text;
+            btn.onclick = function() { nextScene(action); };
+            document.getElementById("scene").appendChild(btn);
         }
     </script>
 </body>
