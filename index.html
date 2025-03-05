@@ -6,12 +6,12 @@
     <title>Homeless Survival Simulation</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #282828;
+            font-family: 'Poppins', sans-serif;
+            background-size: cover;
             color: white;
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            text-align: center;
         }
 
         .container {
@@ -19,24 +19,35 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            text-align: center;
-            width: 80%;
+            width: 90%;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        h1, h4 {
+            margin-bottom: 30px;
         }
 
         .button {
-            background-color: #0044cc;
+            background: #ff914d;
             border: none;
-            padding: 15px 32px;
-            font-size: 16px;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
             color: white;
             cursor: pointer;
-            margin: 10px;
-            border-radius: 5px;
+            margin: 20px auto;
+            border-radius: 8px;
             transition: all 0.3s ease;
+            display: block;
+            width: 85%;
         }
 
         .button:hover {
-            background-color: #0077cc;
+            background: #ffb085;
         }
 
         .fade {
@@ -48,58 +59,60 @@
             100% { opacity: 1; }
         }
 
-        .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://example.com/your-background-image.jpg');
-            background-size: cover;
-            background-position: center;
-            z-index: -1;
-            opacity: 0.6;
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 30px;
+            }
+            .button {
+                width: 90%;
+            }
         }
 
+        .fact {
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <div class="background"></div>
-
-    <div id="container" class="container">
-        <div id="storyText" class="fade">
-            <h1>Welcome to the Homelessness Simulation Experience</h1>
-            <h4 id="narrative">In this simulation, you'll make choices that reflect what it might be like to experience homelessness. Every decision impacts your journey. Follow along, answer honestly, and see where your path takes you.</h4>
-            <button class="button" onclick="nextScene(1)">Start the game</button>
-            
-        </div>
+    <div id="container" class="container fade">
+        <h1>Welcome to the Homelessness Simulation Experience</h1>
+        <h4 id="narrative">In this simulation, you'll make choices that reflect what it might be like to experience homelessness. Every decision impacts your journey. Follow along, answer honestly, and see where your path takes you.</h4>
+        <button class="button" onclick="nextScene(1)">Start the Simulation</button>
     </div>
 
     <script>
         let currentScene = 0;
-        let outcome = '';
-		const factElement = document.createElement('div');
-		
-        function nextScene(scene) {
+        
+        
+        function nextScene(scene, outcome = null) {
             currentScene = scene;
             updateScene();
+            if (outcome) {
+                showOutcome(outcome);
+            }
         }
 
         function updateScene() {
-            const narrative = document.getElementById('narrative');
-            const buttons = document.querySelectorAll('.button');
-            const storyText = document.getElementById('storyText');
+            const container = document.getElementById('container');
+            container.innerHTML = '';
 
-            // Remove all previous buttons
-            buttons.forEach(button => button.remove());
+            /*const title = document.createElement('h1');
+            title.innerText = "Homelessness Simulation";
+            container.appendChild(title);
+			*/
+            const narrative = document.createElement('h4');
+            narrative.id = 'narrative';
+            container.appendChild(narrative);
 
             switch (currentScene) {
-				case 0:
-					narrative.innerHTML = ""
-					createButtons([
-                        { text: "Start the game", next: 1}
-                    ]);
-				break;
+                case 0:
+                    //narrative.innerHTML = "Make choices that impact your journey. Will you survive?";
+					narrative.innerHTML = "<h1>Welcome to the Homelessness Simulation Experience</h1><h4>In this simulation, you'll make choices that reflect what it might be like to experience homelessness. Every decision impacts your journey. Follow along, answer honestly, and see where your path takes you.</h4>";
+                    createButtons([{ text: "Start the Simulation", next: 1 }]);
+                    break;
                 case 1:
                     narrative.innerHTML = "<h4>You’ve just lost your job and your housing situation. You have $20, no car, and nowhere to sleep tonight. What will you do first?<h/4>";
                     createButtons([
@@ -219,52 +232,68 @@
 					break;
                 // Continue similar patterns for the other scenes...
                 default:
-                    narrative.innerHTML = "<h3>Simulation Over. Thank you for participating!</h3>";
+                    /*narrative.innerHTML = "<h3>Simulation Over. Thank you for participating!</h3>";
 					createButtons([
-                        { text: "Restart Game", next: 0, outcome: 'empty' }
-                    ]);
+                        { text: "Restart Game", next: 1 }
+                    ]);*/
 					break;
             }
-
-            // Apply fade-in effect for scene transition
-            storyText.classList.add('fade');
-            setTimeout(() => {
-                storyText.classList.remove('fade');
-            }, 1000);
         }
 
         function createButtons(options) {
-            const container = document.querySelector('.container');
-
+            const container = document.getElementById('container');
             options.forEach(option => {
                 const button = document.createElement('button');
                 button.classList.add('button');
                 button.innerHTML = option.text;
-                button.onclick = function() {
-                    nextScene(option.next);
-                    if (option.outcome) {
-                        showOutcome(option.outcome);
-                    }
-                };
+                button.onclick = () => nextScene(option.next, option.outcome || null);
                 container.appendChild(button);
             });
         }
-		
+
         function showOutcome(outcome) {
-            //const factElement = document.createElement('p');
-            factElement.style.color = 'white';
-			factElement.style.textAlign = 'center';
-			factElement.style.marginTop = '20px';
+			
+			const container = document.getElementById('container');
+            const title = document.createElement('h1');
+			const outcomeElement = document.createElement('h3');
+			const narrative = document.createElement('h4');
+			
+			narrative.innerHTML = "Simulation Over. Thank you for participating!";
+			
+			if (outcome === 'survived') {
+				title.innerHTML = "You survived!";
+				container.appendChild(title);
+				
+                outcomeElement.innerHTML = "Fact: 1 in 5 people who experience homelessness will survive with help from shelters, charities, and individuals.";
+				container.appendChild(outcomeElement);
+
+				container.appendChild(narrative);
+				createButtons([
+					{ text: "Restart the Simulation", next: 0 }
+				]);
+				
+            } else if (outcome === 'died') {
+				title.innerHTML = "You didn't make it!";
+				container.appendChild(title);
+				
+                outcomeElement.innerHTML = "Fact: Homelessness is a serious issue, with an estimated 580,000 people experiencing homelessness in the U.S. each year.";
+				container.appendChild(outcomeElement);
+				
+				container.appendChild(narrative);
+				createButtons([
+					{ text: "Restart the Simulation", next: 0 }
+				]);
+            }
+			//container.appendChild(narrative);
+			/*
+            factElement.innerHTML = '';
             if (outcome === 'survived') {
                 factElement.innerHTML = "<h2>You survived! Fact: 1 in 5 people who experience homelessness will survive with help from shelters, charities, and individuals.</h2>";
             } else if (outcome === 'died') {
                 factElement.innerHTML = "<h2>You didn't make it. Fact: Homelessness is a serious issue, with an estimated 580,000 people experiencing homelessness in the U.S. each year.</h2>";
-            } else if (outcome === 'empty') {
-                factElement.innerHTML = ""
             }
-            document.body.appendChild(factElement);
+			*/
         }
-
     </script>
 </body>
 </html>
