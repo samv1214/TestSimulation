@@ -8,15 +8,49 @@
         body {
             font-family: 'Poppins', sans-serif;
             background: url('homeless-image.jpg') no-repeat center center fixed;
-			background-color: #cddcd7;
+            background-color: #cddcd7; /* Fallback color */
             background-size: cover;
-            color: white;
             margin: 0;
             padding: 0;
             text-align: center;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* The text initially hidden */
+        .text {
+            opacity: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: opacity 1s ease-in-out;
+        }
+
+        /* Animation to fade in text after 5 seconds */
+        .show-text {
+            opacity: 1;
+        }
+
+        /* Fade out the background image after 5 seconds */
+        .fade-background {
+            animation: fadeOut 5s forwards;
+        }
+
+        /* Fade-out effect for the background image */
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
         }
 
         .container {
+			display: none; /* Initially hidden */
             position: absolute;
             top: 50%;
             left: 50%;
@@ -79,7 +113,7 @@
     </style>
 </head>
 <body>
-    <div id="container" class="container fade">
+    <div id="container" class="container">
         <h1>Welcome to the Homelessness Simulation Experience</h1>
         <h4 id="narrative">In this simulation, you'll make choices that reflect what it might be like to experience homelessness. Every decision impacts your journey. Follow along, answer honestly, and see where your path takes you.</h4>
         <button class="button" onclick="nextScene(1)">Start the Simulation</button>
@@ -88,13 +122,25 @@
     <script>
         let currentScene = 0;
         
+		// Wait for 2 seconds, then change the background and show text
+        setTimeout(function() {
+            document.getElementById('container').style.display = 'block';
+        }, 2000); // Show the container after 2 seconds
         
         function nextScene(scene, outcome = null) {
+			document.body.style.background = 'none'; // Remove background image
+			document.body.style.backgroundColor = '#cddcd7'; // Sets the background color
             currentScene = scene;
             updateScene();
             if (outcome) {
                 showOutcome(outcome);
             }
+        }
+
+        function startSimulation() {
+            //document.body.style.background = 'none'; // Remove background image
+            document.body.style.backgroundColor = '#cddcd7'; // Set new background color
+            document.getElementById('container').style.display = 'block'; // Show the welcome text
         }
 
         function updateScene() {
@@ -111,11 +157,22 @@
 
             switch (currentScene) {
                 case 0:
-                    //narrative.innerHTML = "Make choices that impact your journey. Will you survive?";
-					narrative.innerHTML = "<h1>Welcome to the Homelessness Simulation Experience</h1><h4>In this simulation, you'll make choices that reflect what it might be like to experience homelessness. Every decision impacts your journey. Follow along, answer honestly, and see where your path takes you.</h4>";
+                    document.getElementById('container').style.display = 'none'; // Hide welcome text initially
+                    document.body.style.backgroundImage = "url('homeless-image.jpg')";
+                    document.body.style.backgroundRepeat = "no-repeat";
+                    document.body.style.backgroundPosition = "center center";
+                    document.body.style.backgroundAttachment = "fixed";
+                    document.body.style.backgroundSize = "cover";
+
+                    setTimeout(function() {
+                        startSimulation();
+                    }, 2000); // Show the image for 2 seconds, then remove it and display welcome text
+                    
+                    narrative.innerHTML = "<h1>Welcome to the Homelessness Simulation Experience</h1><h4>In this simulation, you'll make choices that reflect what it might be like to experience homelessness. Every decision impacts your journey. Follow along, answer honestly, and see where your path takes you.</h4>";
                     createButtons([{ text: "Start the Simulation", next: 1 }]);
                     break;
                 case 1:
+					
                     narrative.innerHTML = "<h4>You’ve just lost your job and your housing situation. You have $20, no car, and nowhere to sleep tonight. What will you do first?<h/4>";
                     createButtons([
                         { text: "Try to find a homeless shelter nearby", next: 2 },
@@ -145,25 +202,25 @@
                     ]);
                     break;
                 case 5:
-                    narrative.innerHTML = "<h2>Next Day Struggles:</h2>";
+                    narrative.innerHTML = "<h2>Next Day Struggles</h2>";
                     createButtons([
                         { text: "You sleep near the shelter and get in the next night — but there’s no hot food left, and you're still hungry", next: 9 }
                     ]);
                     break;
                 case 6:
-                    narrative.innerHTML = "<h2>Next Day Struggles:</h2>";
+                    narrative.innerHTML = "<h2>Next Day Struggles</h2>";
                     createButtons([
                         { text: "Walking all night leaves you exhausted. By morning, you're weak and have spent $5 on water", next: 10 }
                     ]);
                     break;
                 case 7:
-                    narrative.innerHTML = "<h2>Next Day Struggles:</h2>";
+                    narrative.innerHTML = "<h2>Next Day Struggles</h2>";
                     createButtons([
                         { text: "You buy food but now only have $10 left. You feel better but still have nowhere to sleep", next: 11 }
                     ]);
                     break;
                 case 8:
-                    narrative.innerHTML = "<h2>Next Day Struggles:</h2>";
+                    narrative.innerHTML = "<h2>Next Day Struggles</h2>";
                     createButtons([
                         { text: "Asking for help earns you $5 from strangers, but the embarrassment weighs on you", next: 12 }
                     ]);
