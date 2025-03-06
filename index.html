@@ -8,7 +8,7 @@
         body {
             font-family: 'Poppins', sans-serif;
             background: url('homeless-image.jpg') no-repeat center center fixed;
-            background-color: #cddcd7; /* Fallback color */
+            background-color: #cddcd7;
             background-size: cover;
             margin: 0;
             padding: 0;
@@ -29,12 +29,12 @@
             transition: opacity 1s ease-in-out;
         }
 
-        /* Animation to fade in text after 5 seconds */
+        /* Animation to fade in text after 1.5 seconds */
         .show-text {
             opacity: 1;
         }
 
-        /* Fade out the background image after 5 seconds */
+        /* Fade out the background image after 1.5 seconds */
         .fade-background {
             animation: fadeOut 5s forwards;
         }
@@ -125,10 +125,10 @@
     <script>
         let currentScene = 0;
         
-		// Wait for 2 seconds, then change the background and show text
+		// Wait for 1.5 seconds, then change the background and show text
         setTimeout(function() {
             document.getElementById('container').style.display = 'block';
-        }, 1000); // Show the container after 2 seconds
+        }, 1500); // Show the container after 1.5 seconds
         
         function nextScene(scene, outcome = null) {
 			document.body.style.background = 'none'; // Remove background image
@@ -139,7 +139,8 @@
                 showOutcome(outcome);
             }
         }
-
+		
+		//Adjust the background images to be compatible with Mobile, Tablet, Laptop and Desktop systems
         function adjustBackgroundSize() {
             if (window.innerWidth < 768) {
                 document.body.style.backgroundSize = 'contain';
@@ -152,23 +153,19 @@
         window.addEventListener('load', adjustBackgroundSize);
 
         function startSimulation() {
-            //document.body.style.background = 'none'; // Remove background image
             document.body.style.backgroundColor = '#cddcd7'; // Set new background color
             document.getElementById('container').style.display = 'block'; // Show the welcome text
         }
-
+		
         function updateScene() {
             const container = document.getElementById('container');
             container.innerHTML = '';
-
-            /*const title = document.createElement('h1');
-            title.innerText = "Homelessness Simulation";
-            container.appendChild(title);
-			*/
+			
             const narrative = document.createElement('h4');
             narrative.id = 'narrative';
             container.appendChild(narrative);
-
+			
+			//Iterates through the different scenes
             switch (currentScene) {
                 case 0:
                     document.getElementById('container').style.display = 'none'; // Hide welcome text initially
@@ -180,7 +177,7 @@
                     adjustBackgroundSize();
                     setTimeout(function() {
                         startSimulation();
-                    }, 1000); // Show the image for 2 seconds, then remove it and display welcome text
+                    }, 1500); // Show the image for 1.5 seconds, then remove it and display welcome text
                     
                     narrative.innerHTML = "<h1>Welcome to the Homelessness Simulation Experience!</h1><h4>In this simulation, you'll make choices that reflect what it might be like to experience homelessness. Every decision impacts your journey. Follow along, answer honestly, and see where your path takes you.</h4>";
                     createButtons([{ text: "Start the Simulation", next: 1 }]);
@@ -312,7 +309,8 @@
 					break;
             }
         }
-
+		
+		//To create buttons in the run time
         function createButtons(options) {
             const container = document.getElementById('container');
             options.forEach(option => {
@@ -324,6 +322,7 @@
             });
         }
 
+		//To show the outcome of the scenes and facts
         function showOutcome(outcome) {
 			
 			const container = document.getElementById('container');
@@ -333,6 +332,7 @@
 			
 			narrative.innerHTML = "Simulation Over. Thank you for participating!";
 			
+			//The following if statement for survival facts
 			if (outcome === 'survived') {
 				title.innerHTML = "You survived!";
 				container.appendChild(title);
@@ -345,7 +345,7 @@
 					{ text: "Restart the Simulation", next: 0 }
 				]);
 				
-            } else if (outcome === 'died') {
+            } else if (outcome === 'died') { //The else if statement for didn't make it facts
 				title.innerHTML = "You didn't make it!";
 				container.appendChild(title);
 				
@@ -357,15 +357,6 @@
 					{ text: "Restart the Simulation", next: 0 }
 				]);
             }
-			//container.appendChild(narrative);
-			/*
-            factElement.innerHTML = '';
-            if (outcome === 'survived') {
-                factElement.innerHTML = "<h2>You survived! Fact: 1 in 5 people who experience homelessness will survive with help from shelters, charities, and individuals.</h2>";
-            } else if (outcome === 'died') {
-                factElement.innerHTML = "<h2>You didn't make it. Fact: Homelessness is a serious issue, with an estimated 580,000 people experiencing homelessness in the U.S. each year.</h2>";
-            }
-			*/
         }
     </script>
 </body>
